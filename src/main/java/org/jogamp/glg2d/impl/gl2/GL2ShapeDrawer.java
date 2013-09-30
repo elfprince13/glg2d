@@ -22,15 +22,17 @@ import java.awt.RenderingHints.Key;
 import java.awt.Shape;
 import java.awt.Stroke;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GLContext;
+
 
 import org.jogamp.glg2d.GLGraphics2D;
 import org.jogamp.glg2d.impl.AbstractShapeHelper;
 import org.jogamp.glg2d.impl.SimpleOrTesselatingVisitor;
 
 public class GL2ShapeDrawer extends AbstractShapeHelper {
-  protected GL2 gl;
+  protected GLContext context;
 
   protected FillSimpleConvexPolygonVisitor simpleFillVisitor;
   protected SimpleOrTesselatingVisitor complexFillVisitor;
@@ -47,13 +49,11 @@ public class GL2ShapeDrawer extends AbstractShapeHelper {
   @Override
   public void setG2D(GLGraphics2D g2d) {
     super.setG2D(g2d);
-    GL gl = g2d.getGLContext().getGL();
-    simpleFillVisitor.setGLContext(gl);
-    complexFillVisitor.setGLContext(gl);
-    simpleStrokeVisitor.setGLContext(gl);
-    fastLineVisitor.setGLContext(gl);
-
-    this.gl = gl.getGL2();
+    context = g2d.getGLContext();
+    simpleFillVisitor.setGLContext(context);
+    complexFillVisitor.setGLContext(context);
+    simpleStrokeVisitor.setGLContext(context);
+    fastLineVisitor.setGLContext(context);
   }
 
   @Override
@@ -62,9 +62,9 @@ public class GL2ShapeDrawer extends AbstractShapeHelper {
 
     if (key == RenderingHints.KEY_ANTIALIASING) {
       if (value == RenderingHints.VALUE_ANTIALIAS_ON) {
-        gl.glEnable(GL.GL_MULTISAMPLE);
+       GL11.glEnable(GL13.GL_MULTISAMPLE);
       } else {
-        gl.glDisable(GL.GL_MULTISAMPLE);
+        GL11.glDisable(GL13.GL_MULTISAMPLE);
       }
     }
   }

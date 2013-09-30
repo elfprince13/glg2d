@@ -25,7 +25,7 @@ import java.awt.RenderingHints.Key;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import javax.media.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import org.jogamp.glg2d.GLG2DColorHelper;
 import org.jogamp.glg2d.GLGraphics2D;
@@ -74,8 +74,7 @@ public abstract class AbstractColorHelper implements GLG2DColorHelper {
 
   @Override
   public void setComposite(Composite comp) {
-    GL gl = g2d.getGLContext().getGL();
-    gl.glEnable(GL.GL_BLEND);
+    GL11.glEnable(GL11.GL_BLEND);
     if (comp instanceof AlphaComposite) {
       switch (((AlphaComposite) comp).getRule()) {
       /*
@@ -86,32 +85,32 @@ public abstract class AbstractColorHelper implements GLG2DColorHelper {
        */
       case AlphaComposite.SRC:
       case AlphaComposite.SRC_IN:
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ZERO);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ZERO);
         break;
 
       case AlphaComposite.SRC_OVER:
       case AlphaComposite.SRC_ATOP:
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         break;
 
       case AlphaComposite.SRC_OUT:
       case AlphaComposite.CLEAR:
-        gl.glBlendFunc(GL.GL_ZERO, GL.GL_ZERO);
+        GL11.glBlendFunc(GL11.GL_ZERO, GL11.GL_ZERO);
         break;
 
       case AlphaComposite.DST:
       case AlphaComposite.DST_OVER:
-        gl.glBlendFunc(GL.GL_ZERO, GL.GL_ONE);
+        GL11.glBlendFunc(GL11.GL_ZERO, GL11.GL_ONE);
         break;
 
       case AlphaComposite.DST_IN:
       case AlphaComposite.DST_ATOP:
-        gl.glBlendFunc(GL.GL_ZERO, GL.GL_SRC_ALPHA);
+        GL11.glBlendFunc(GL11.GL_ZERO, GL11.GL_SRC_ALPHA);
         break;
 
       case AlphaComposite.DST_OUT:
       case AlphaComposite.XOR:
-        gl.glBlendFunc(GL.GL_ZERO, GL.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glBlendFunc(GL11.GL_ZERO, GL11.GL_ONE_MINUS_SRC_ALPHA);
         break;
       }
 

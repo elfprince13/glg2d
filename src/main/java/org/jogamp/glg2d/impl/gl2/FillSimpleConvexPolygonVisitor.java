@@ -18,8 +18,8 @@ package org.jogamp.glg2d.impl.gl2;
 
 import java.awt.BasicStroke;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.VertexBuffer;
 import org.jogamp.glg2d.impl.SimplePathVisitor;
@@ -29,13 +29,13 @@ import org.jogamp.glg2d.impl.SimplePathVisitor;
  * polygon is actually simple and convex.
  */
 public class FillSimpleConvexPolygonVisitor extends SimplePathVisitor {
-  protected GL2 gl;
+  protected GLContext context;
 
   protected VertexBuffer vBuffer = VertexBuffer.getSharedBuffer();
 
   @Override
-  public void setGLContext(GL context) {
-    gl = context.getGL2();
+  public void setGLContext(GLContext ctx) {
+    context = ctx;
   }
 
   @Override
@@ -50,12 +50,12 @@ public class FillSimpleConvexPolygonVisitor extends SimplePathVisitor {
     /*
      * We don't care what the winding rule is, we disable face culling.
      */
-    gl.glDisable(GL.GL_CULL_FACE);
+    GL11.glDisable(GL11.GL_CULL_FACE);
   }
 
   @Override
   public void closeLine() {
-    vBuffer.drawBuffer(gl, GL2.GL_POLYGON);
+    vBuffer.drawBuffer(GL11.GL_POLYGON);
   }
 
   @Override

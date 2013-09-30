@@ -16,6 +16,7 @@
 package org.jogamp.glg2d.impl.shader;
 
 import java.awt.geom.AffineTransform;
+import java.nio.FloatBuffer;
 
 /**
  * This class implements a Uniform Buffer Object on OpenGL ES 2.0 compatible
@@ -26,14 +27,14 @@ public class UniformBufferObject {
   public TransformHook transformHook;
 
   public interface ColorHook {
-    float[] getRGBA();
+    FloatBuffer getRGBA();
 
     float getAlpha();
   }
 
   public interface TransformHook {
-    float[] getGLMatrixData();
+    FloatBuffer getGLMatrixData();
 
-    float[] getGLMatrixData(AffineTransform concat);
+    FloatBuffer getGLMatrixData(AffineTransform concat);
   }
 }

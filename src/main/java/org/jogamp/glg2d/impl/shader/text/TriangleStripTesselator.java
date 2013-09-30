@@ -21,7 +21,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.media.opengl.GL;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.impl.AbstractTesselatorVisitor;
 
@@ -29,7 +30,7 @@ public class TriangleStripTesselator extends AbstractTesselatorVisitor {
   protected Collection<TriangleStrip> triangleStrips;
 
   @Override
-  public void setGLContext(GL context) {
+  public void setGLContext(GLContext context) {
     // nop
   }
 
@@ -63,17 +64,17 @@ public class TriangleStripTesselator extends AbstractTesselatorVisitor {
     int size = vertexBuffer.limit() - vertexBuffer.position();
     Collection<TriangleStrip> strips = new ArrayList<TriangleStrip>();
 
-    if (drawMode == GL.GL_TRIANGLE_STRIP) {
+    if (drawMode == GL11.GL_TRIANGLE_STRIP) {
       float[] v = new float[size];
       vertexBuffer.get(v);
       strips.add(new TriangleStrip(v));
-    } else if (drawMode == GL.GL_TRIANGLES) {
+    } else if (drawMode == GL11.GL_TRIANGLES) {
       float[] v = new float[6];
       while (vertexBuffer.remaining() >= 6) {
         vertexBuffer.get(v);
         strips.add(new TriangleStrip(v.clone()));
       }
-    } else if (drawMode == GL.GL_TRIANGLE_FAN) {
+    } else if (drawMode == GL11.GL_TRIANGLE_FAN) {
       int newSize = (int) ceil((size - 2) / 4.0) + size;
       float[] v = new float[newSize];
 

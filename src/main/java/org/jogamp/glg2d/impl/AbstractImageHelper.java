@@ -41,9 +41,8 @@ import org.jogamp.glg2d.GLG2DImageHelper;
 import org.jogamp.glg2d.GLG2DRenderingHints;
 import org.jogamp.glg2d.GLGraphics2D;
 
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureCoords;
-import com.jogamp.opengl.util.texture.awt.AWTTextureIO;
+import org.newdawn.slick.util.*;
+import org.newdawn.slick.opengl.*;
 
 public abstract class AbstractImageHelper implements GLG2DImageHelper {
   private static final Logger LOGGER = Logger.getLogger(AbstractImageHelper.class.getName());
@@ -58,7 +57,7 @@ public abstract class AbstractImageHelper implements GLG2DImageHelper {
 
   protected abstract void begin(Texture texture, AffineTransform xform, Color bgcolor);
 
-  protected abstract void applyTexture(Texture texture, int dx1, int dy1, int dx2, int dy2,
+  protected abstract void applyTexture(Texture texture, float dx1, float dy1, float dx2, float dy2,
       float sx1, float sy1, float sx2, float sy2);
 
   protected abstract void end(Texture texture);
@@ -154,11 +153,10 @@ public abstract class AbstractImageHelper implements GLG2DImageHelper {
   }
 
   protected void applyTexture(Texture texture) {
-    int width = texture.getWidth();
-    int height = texture.getHeight();
-    TextureCoords coords = texture.getImageTexCoords();
-
-    applyTexture(texture, 0, 0, width, height, coords.left(), coords.top(), coords.right(), coords.bottom());
+    //float width = texture.getImageWidth();
+    //float height = texture.getHeight();
+    
+    applyTexture(texture, 0, 0, texture.getTextureWidth(), texture.getTextureHeight(), 0, 0, 1, 1);
   }
 
   /**
@@ -196,11 +194,18 @@ public abstract class AbstractImageHelper implements GLG2DImageHelper {
 
   protected Texture create(BufferedImage image) {
     // we'll assume the image is complete and can be rendered
-    return AWTTextureIO.newTexture(g2d.getGLContext().getGL().getGLProfile(), image, false);
+	Texture t;
+	  try{
+		  t = BufferedImageUtil.getTexture(image.toString(),image);
+	  } catch (java.io.IOException e) { 
+		  e.printStackTrace(); 
+		  t = null;
+	  }
+	  return t;
   }
 
   protected void destroy(Texture texture) {
-    texture.destroy(g2d.getGLContext().getGL());
+    texture.release();
   }
 
   protected void addToCache(Image image, Texture texture) {

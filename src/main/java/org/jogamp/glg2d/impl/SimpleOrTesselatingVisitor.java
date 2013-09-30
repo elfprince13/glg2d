@@ -21,7 +21,7 @@ import static java.lang.Math.sqrt;
 import java.awt.BasicStroke;
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.PathVisitor;
 import org.jogamp.glg2d.VertexBuffer;
@@ -99,7 +99,7 @@ public class SimpleOrTesselatingVisitor extends SimplePathVisitor {
   }
 
   @Override
-  public void setGLContext(GL context) {
+  public void setGLContext(GLContext context) {
     simpleFallback.setGLContext(context);
     tesselatorFallback.setGLContext(context);
   }
@@ -291,4 +291,5 @@ public class SimpleOrTesselatingVisitor extends SimplePathVisitor {
     // put everything back the way it was
     buffer.clear();
   }
+
 }

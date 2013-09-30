@@ -15,7 +15,8 @@
  */
 package org.jogamp.glg2d.impl.shader.text;
 
-import javax.media.opengl.GL2ES2;
+
+import org.lwjgl.opengl.GL20;
 
 import org.jogamp.glg2d.impl.shader.AnyModePipeline;
 
@@ -32,21 +33,21 @@ public class TextPipeline extends AnyModePipeline {
     super(vertexShaderFilename, fragmentShaderFilename);
   }
 
-  public void setLocation(GL2ES2 gl, float x, float y) {
+  public void setLocation(float x, float y) {
     if (xOffsetLocation >= 0) {
-      gl.glUniform1f(xOffsetLocation, x);
+      GL20.glUniform1f(xOffsetLocation, x);
     }
 
     if (yOffsetLocation >= 0) {
-      gl.glUniform1f(yOffsetLocation, y);
+      GL20.glUniform1f(yOffsetLocation, y);
     }
   }
 
   @Override
-  protected void setupUniformsAndAttributes(GL2ES2 gl) {
-    super.setupUniformsAndAttributes(gl);
+  protected void setupUniformsAndAttributes() {
+    super.setupUniformsAndAttributes();
 
-    xOffsetLocation = gl.glGetUniformLocation(programId, "u_xoffset");
-    yOffsetLocation = gl.glGetUniformLocation(programId, "u_yoffset");
+    xOffsetLocation = GL20.glGetUniformLocation(programId, "u_xoffset");
+    yOffsetLocation = GL20.glGetUniformLocation(programId, "u_yoffset");
   }
 }

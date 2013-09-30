@@ -19,10 +19,9 @@ import static org.jogamp.glg2d.GLG2DUtils.ensureIsGLBuffer;
 
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2ES2;
-
-import com.jogamp.common.nio.Buffers;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 
 public class GL2ES2ImagePipeline extends AbstractShaderPipeline {
   protected int vertexBufferId = -1;
@@ -39,53 +38,53 @@ public class GL2ES2ImagePipeline extends AbstractShaderPipeline {
     super(vertexShaderFileName, null, fragmentShaderFileName);
   }
 
-  public void setTextureUnit(GL2ES2 gl, int unit) {
+  public void setTextureUnit(int unit) {
     if (textureLocation >= 0) {
-      gl.glUniform1i(textureLocation, unit);
+      GL20.glUniform1i(textureLocation, unit);
     }
   }
 
-  protected void bufferData(GL2ES2 gl, FloatBuffer buffer) {
-    vertexBufferId = ensureIsGLBuffer(gl, vertexBufferId);
+  protected void bufferData(FloatBuffer buffer) {
+    vertexBufferId = ensureIsGLBuffer(vertexBufferId);
 
-    gl.glEnableVertexAttribArray(vertCoordLocation);
-    gl.glEnableVertexAttribArray(texCoordLocation);
+    GL20.glEnableVertexAttribArray(vertCoordLocation);
+    GL20.glEnableVertexAttribArray(texCoordLocation);
 
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vertexBufferId);
-    gl.glBufferData(GL.GL_ARRAY_BUFFER, Buffers.SIZEOF_FLOAT * 16, buffer, GL.GL_STATIC_DRAW);
+    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertexBufferId);
+    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
 
-    gl.glVertexAttribPointer(vertCoordLocation, 2, GL.GL_FLOAT, false, 4 * Buffers.SIZEOF_FLOAT, 0);
-    gl.glVertexAttribPointer(texCoordLocation, 2, GL.GL_FLOAT, false, 4 * Buffers.SIZEOF_FLOAT, 2 * Buffers.SIZEOF_FLOAT);
+    GL20.glVertexAttribPointer(vertCoordLocation, 2, GL11.GL_FLOAT, false, 4 * (Float.SIZE / Byte.SIZE), 0);
+    GL20.glVertexAttribPointer(texCoordLocation, 2, GL11.GL_FLOAT, false, 4 * (Float.SIZE / Byte.SIZE), 2 * (Float.SIZE / Byte.SIZE));
   }
 
-  public void draw(GL2ES2 gl, FloatBuffer interleavedVertTexBuffer) {
-    bufferData(gl, interleavedVertTexBuffer);
+  public void draw(FloatBuffer interleavedVertTexBuffer) {
+    bufferData(interleavedVertTexBuffer);
 
-    gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, 4);
+    GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 
-    gl.glDisableVertexAttribArray(vertCoordLocation);
-    gl.glDisableVertexAttribArray(texCoordLocation);
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-  }
-
-  @Override
-  protected void setupUniformsAndAttributes(GL2ES2 gl) {
-    super.setupUniformsAndAttributes(gl);
-
-    transformLocation = gl.glGetUniformLocation(programId, "u_transform");
-    colorLocation = gl.glGetUniformLocation(programId, "u_color");
-    textureLocation = gl.glGetUniformLocation(programId, "u_tex");
-
-    vertCoordLocation = gl.glGetAttribLocation(programId, "a_vertCoord");
-    texCoordLocation = gl.glGetAttribLocation(programId, "a_texCoord");
+    GL20.glDisableVertexAttribArray(vertCoordLocation);
+    GL20.glDisableVertexAttribArray(texCoordLocation);
+    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
   }
 
   @Override
-  public void delete(GL2ES2 gl) {
-    super.delete(gl);
+  protected void setupUniformsAndAttributes() {
+    super.setupUniformsAndAttributes();
 
-    if (gl.glIsBuffer(vertexBufferId)) {
-      gl.glDeleteBuffers(1, new int[] { vertexBufferId }, 0);
+    transformLocation = GL20.glGetUniformLocation(programId, "u_transform");
+    colorLocation = GL20.glGetUniformLocation(programId, "u_color");
+    textureLocation = GL20.glGetUniformLocation(programId, "u_tex");
+
+    vertCoordLocation = GL20.glGetAttribLocation(programId, "a_vertCoord");
+    texCoordLocation = GL20.glGetAttribLocation(programId, "a_texCoord");
+  }
+
+  @Override
+  public void delete() {
+    super.delete();
+
+    if (GL15.glIsBuffer(vertexBufferId)) {
+      GL15.glDeleteBuffers(vertexBufferId);
     }
   }
 }

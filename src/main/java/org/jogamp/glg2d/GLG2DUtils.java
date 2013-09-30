@@ -19,46 +19,48 @@ import java.awt.Color;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2ES1;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import java.nio.IntBuffer;
+import org.lwjgl.BufferUtils;
 
 public class GLG2DUtils {
   private static final Logger LOGGER = Logger.getLogger(GLG2DUtils.class.getName());
 
-  public static void setColor(GL2ES1 gl, Color c, float preMultiplyAlpha) {
+  public static void setColor(Color c, float preMultiplyAlpha) {
     int rgb = c.getRGB();
-    gl.glColor4ub((byte) (rgb >> 16 & 0xFF), (byte) (rgb >> 8 & 0xFF), (byte) (rgb & 0xFF), (byte) ((rgb >> 24 & 0xFF) * preMultiplyAlpha));
+    GL11.glColor4ub((byte) (rgb >> 16 & 0xFF), (byte) (rgb >> 8 & 0xFF), (byte) (rgb & 0xFF), (byte) ((rgb >> 24 & 0xFF) * preMultiplyAlpha));
   }
 
   public static float[] getGLColor(Color c) {
     return c.getComponents(null);
   }
 
-  public static int getViewportHeight(GL gl) {
-    int[] viewportDimensions = new int[4];
-    gl.glGetIntegerv(GL.GL_VIEWPORT, viewportDimensions, 0);
-    int canvasHeight = viewportDimensions[3];
+  public static int getViewportHeight() {
+    IntBuffer viewportDimensions = BufferUtils.createIntBuffer(16);
+    GL11.glGetInteger(GL11.GL_VIEWPORT, viewportDimensions);
+    int canvasHeight = viewportDimensions.get(3);
     return canvasHeight;
   }
 
-  public static void logGLError(GL gl) {
-    int error = gl.glGetError();
-    if (error != GL.GL_NO_ERROR) {
+  public static void logGLError() {
+    int error = GL11.glGetError();
+    if (error != GL11.GL_NO_ERROR) {
       LOGGER.log(Level.SEVERE, "GL Error: code " + error);
     }
   }
 
-  public static int ensureIsGLBuffer(GL gl, int bufferId) {
-    if (gl.glIsBuffer(bufferId)) {
+  public static int ensureIsGLBuffer(int bufferId) {
+    if (GL15.glIsBuffer(bufferId)) {
       return bufferId;
     } else {
-      return genBufferId(gl);
+      return genBufferId();
     }
   }
 
-  public static int genBufferId(GL gl) {
-    int[] ids = new int[1];
-    gl.glGenBuffers(1, ids, 0);
-    return ids[0];
+  public static int genBufferId() {
+	IntBuffer ids = BufferUtils.createIntBuffer(1);
+    GL15.glGenBuffers(ids);
+    return ids.get(0);
   }
 }

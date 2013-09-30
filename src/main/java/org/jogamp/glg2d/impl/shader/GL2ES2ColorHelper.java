@@ -20,12 +20,15 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
 
+import org.lwjgl.BufferUtils;
+import java.nio.FloatBuffer;
+
 import org.jogamp.glg2d.GLGraphics2D;
 import org.jogamp.glg2d.impl.AbstractColorHelper;
 import org.jogamp.glg2d.impl.shader.UniformBufferObject.ColorHook;
 
 public class GL2ES2ColorHelper extends AbstractColorHelper implements ColorHook {
-  protected float[] foregroundRGBA = new float[4];
+  protected FloatBuffer foregroundRGBA = BufferUtils.createFloatBuffer(4);
 
   protected GL2ES2ImagePipeline pipeline;
 
@@ -51,19 +54,17 @@ public class GL2ES2ColorHelper extends AbstractColorHelper implements ColorHook 
 
   @Override
   public void setColorNoRespectComposite(Color c) {
-    foregroundRGBA[0] = c.getRed() / 255f;
-    foregroundRGBA[1] = c.getGreen() / 255f;
-    foregroundRGBA[2] = c.getBlue() / 255f;
-    foregroundRGBA[3] = c.getAlpha() / 255f;
+	  float[] cArray = { c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,c.getAlpha() / 255f};
+	  foregroundRGBA.clear();
+	  foregroundRGBA.put(cArray);
   }
 
   @Override
   public void setColorRespectComposite(Color c) {
     float alpha = getAlpha();
-    foregroundRGBA[0] = c.getRed() / 255f;
-    foregroundRGBA[1] = c.getGreen() / 255f;
-    foregroundRGBA[2] = c.getBlue() / 255f;
-    foregroundRGBA[3] = (c.getAlpha() / 255f) * alpha;
+    float[] cArray = { c.getRed() / 255f,c.getGreen() / 255f,c.getBlue() / 255f,(c.getAlpha() / 255f) * alpha};
+	  foregroundRGBA.clear();
+	  foregroundRGBA.put(cArray);
   }
 
   @Override
@@ -185,7 +186,7 @@ public class GL2ES2ColorHelper extends AbstractColorHelper implements ColorHook 
   }
 
   @Override
-  public float[] getRGBA() {
+  public FloatBuffer getRGBA() {
     return foregroundRGBA;
   }
 }

@@ -27,7 +27,7 @@ import java.nio.FloatBuffer;
 
 import org.jogamp.glg2d.VertexBuffer;
 
-import com.jogamp.common.nio.Buffers;
+import org.lwjgl.BufferUtils;
 
 /**
  * Draws a line, as outlined by a {@link BasicStroke}. The current
@@ -50,7 +50,7 @@ public abstract class BasicStrokeLineVisitor extends SimplePathVisitor {
   protected float[] secondPoint;
 
   protected VertexBuffer vBuffer = new VertexBuffer(1024);
-  protected FloatBuffer tmpBuffer = Buffers.newDirectFloatBuffer(1024);
+  protected FloatBuffer tmpBuffer = BufferUtils.createFloatBuffer(1024);
 
   @Override
   public void setStroke(BasicStroke stroke) {
@@ -136,7 +136,7 @@ public abstract class BasicStrokeLineVisitor extends SimplePathVisitor {
 
       FloatBuffer buf = vBuffer.getBuffer();
       if (tmpBuffer.capacity() < buf.position()) {
-        tmpBuffer = Buffers.newDirectFloatBuffer(buf.position());
+        tmpBuffer = BufferUtils.createFloatBuffer(buf.position());
       }
 
       tmpBuffer.clear();

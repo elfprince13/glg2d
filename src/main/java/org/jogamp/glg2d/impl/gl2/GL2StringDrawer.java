@@ -22,18 +22,21 @@ import java.awt.Font;
 import java.text.AttributedCharacterIterator;
 import java.util.HashMap;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.fixedfunc.GLMatrixFunc;
+import org.lwjgl.opengl.GL11;
 
 import org.jogamp.glg2d.impl.AbstractTextDrawer;
 
-import com.jogamp.opengl.util.awt.TextRenderer;
+import org.newdawn.slick.TrueTypeFont;
+
+import org.lwjgl.BufferUtils;
+import java.nio.FloatBuffer;
 
 /**
  * Draws text for the {@code GLGraphics2D} class.
  */
 public class GL2StringDrawer extends AbstractTextDrawer {
   protected FontRenderCache cache = new FontRenderCache();
+  protected FloatBuffer intcolor = BufferUtils.createFloatBuffer(4);
 
   @Override
   public void dispose() {
@@ -62,14 +65,15 @@ public class GL2StringDrawer extends AbstractTextDrawer {
 
   @Override
   public void drawString(String string, int x, int y) {
-    TextRenderer renderer = getRenderer(getFont());
+    TrueTypeFont renderer = getRenderer(getFont());
 
     begin(renderer);
-    renderer.draw3D(string, x, g2d.getCanvasHeight() - y, 0, 1);
+    intcolor.rewind();
+    renderer.drawString((float)x, (float)(g2d.getCanvasHeight() - y), string, new org.newdawn.slick.Color(intcolor));
     end(renderer);
   }
 
-  protected TextRenderer getRenderer(Font font) {
+  protected TrueTypeFont getRenderer(Font font) {
     return cache.getRenderer(font, stack.peek().antiAlias);
   }
 
@@ -77,7 +81,7 @@ public class GL2StringDrawer extends AbstractTextDrawer {
    * Sets the font color, respecting the AlphaComposite if it wants to
    * pre-multiply an alpha.
    */
-  protected void setTextColorRespectComposite(TextRenderer renderer) {
+  protected void setTextColorRespectComposite(TrueTypeFont renderer) {
     Color color = g2d.getColor();
     if (g2d.getComposite() instanceof AlphaComposite) {
       float alpha = ((AlphaComposite) g2d.getComposite()).getAlpha();
@@ -87,41 +91,38 @@ public class GL2StringDrawer extends AbstractTextDrawer {
       }
     }
 
-    renderer.setColor(color);
+    float[] cArray = { color.getRed() / 255f,color.getGreen() / 255f,color.getBlue() / 255f,color.getAlpha() / 255f};
+	intcolor.clear();
+	intcolor.put(cArray);
   }
 
-  protected void begin(TextRenderer renderer) {
+  protected void begin(TrueTypeFont renderer) {
     setTextColorRespectComposite(renderer);
 
-    GL2 gl = g2d.getGLContext().getGL().getGL2();
-    gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-    gl.glPushMatrix();
-    gl.glScalef(1, -1, 1);
-    gl.glTranslatef(0, -g2d.getCanvasHeight(), 0);
+    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    GL11.glPushMatrix();
+    GL11.glScalef(1, -1, 1);
+    GL11.glTranslatef(0, -g2d.getCanvasHeight(), 0);
 
-    renderer.begin3DRendering();
   }
 
-  protected void end(TextRenderer renderer) {
-    renderer.end3DRendering();
-
-    GL2 gl = g2d.getGLContext().getGL().getGL2();
-    gl.glPopMatrix();
+  protected void end(TrueTypeFont renderer) {
+    GL11.glPopMatrix();
   }
 
   @SuppressWarnings("serial")
-  public static class FontRenderCache extends HashMap<Font, TextRenderer[]> {
-    public TextRenderer getRenderer(Font font, boolean antiAlias) {
-      TextRenderer[] renderers = get(font);
+  public static class FontRenderCache extends HashMap<Font, TrueTypeFont[]> {
+    public TrueTypeFont getRenderer(Font font, boolean antiAlias) {
+      TrueTypeFont[] renderers = get(font);
       if (renderers == null) {
-        renderers = new TextRenderer[2];
+        renderers = new TrueTypeFont[2];
         put(font, renderers);
       }
 
-      TextRenderer renderer = renderers[antiAlias ? 1 : 0];
+      TrueTypeFont renderer = renderers[antiAlias ? 1 : 0];
 
       if (renderer == null) {
-        renderer = new TextRenderer(font, antiAlias, false);
+        renderer = new TrueTypeFont(font, antiAlias);
         renderers[antiAlias ? 1 : 0] = renderer;
       }
 
@@ -129,14 +130,7 @@ public class GL2StringDrawer extends AbstractTextDrawer {
     }
 
     public void dispose() {
-      for (TextRenderer[] value : values()) {
-        if (value[0] != null) {
-          value[0].dispose();
-        }
-        if (value[1] != null) {
-          value[1].dispose();
-        }
-      }
+      
     }
   }
 }

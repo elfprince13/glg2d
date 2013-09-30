@@ -18,6 +18,9 @@ package org.jogamp.glg2d.impl;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 
+import org.lwjgl.opengl.Display;
+import org.lwjgl.LWJGLException;
+
 /**
  * Fulfills the contract of a {@code GraphicsDevice}.
  */
@@ -30,11 +33,14 @@ public class GLGraphicsDevice extends GraphicsDevice {
 
   @Override
   public int getType() {
-    if (config.getTarget().getChosenGLCapabilities().isOnscreen()) {
-      return TYPE_RASTER_SCREEN;
-    } else {
-      return TYPE_IMAGE_BUFFER;
-    }
+	int ret;
+	try { 
+		ret = Display.isCurrent() ? TYPE_RASTER_SCREEN : TYPE_IMAGE_BUFFER;
+	} catch (LWJGLException e) {
+		e.printStackTrace();
+		ret = TYPE_IMAGE_BUFFER;
+	}
+	return ret;
   }
 
   @Override

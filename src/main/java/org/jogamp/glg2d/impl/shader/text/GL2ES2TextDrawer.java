@@ -22,7 +22,7 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.Point2D;
 import java.text.AttributedCharacterIterator;
 
-import javax.media.opengl.GL2ES2;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.GLGraphics2D;
 import org.jogamp.glg2d.impl.AbstractTextDrawer;
@@ -31,7 +31,7 @@ import org.jogamp.glg2d.impl.shader.text.CollectingTesselator.Triangles;
 
 public class GL2ES2TextDrawer extends AbstractTextDrawer {
   protected GLShaderGraphics2D g2d;
-  protected GL2ES2 gl;
+  protected GLContext context;
 
   protected TextPipeline pipeline;
 
@@ -52,9 +52,9 @@ public class GL2ES2TextDrawer extends AbstractTextDrawer {
           + GLShaderGraphics2D.class.getSimpleName());
     }
 
-    gl = g2d.getGLContext().getGL().getGL2ES2();
+    context = g2d.getGLContext();
     if (!pipeline.isSetup()) {
-      pipeline.setup(gl);
+      pipeline.setup();
     }
 
     super.setG2D(g2d);
@@ -62,7 +62,7 @@ public class GL2ES2TextDrawer extends AbstractTextDrawer {
 
   @Override
   public void dispose() {
-    pipeline.delete(gl);
+    pipeline.delete();
   }
 
   @Override
@@ -91,24 +91,24 @@ public class GL2ES2TextDrawer extends AbstractTextDrawer {
   }
 
   protected void drawChars(char[] string, float x, float y) {
-    pipeline.use(gl, true);
-    pipeline.setColor(gl, g2d.getUniformsObject().colorHook.getRGBA());
-    pipeline.setTransform(gl, g2d.getUniformsObject().transformHook.getGLMatrixData());
+    pipeline.use(true);
+    pipeline.setColor(g2d.getUniformsObject().colorHook.getRGBA());
+    pipeline.setTransform(g2d.getUniformsObject().transformHook.getGLMatrixData());
 
-    pipeline.bindBuffer(gl);
+    pipeline.bindBuffer();
 
     GlyphVector glyphs = getFont().createGlyphVector(getFontRenderContext(), string);
     for (int i = 0; i < string.length; i++) {
       Triangles triangles = getTesselatedGlyph(string[i]);
 
       Point2D pt = glyphs.getGlyphPosition(i);
-      pipeline.setLocation(gl, (float) pt.getX() + x, (float) pt.getY() + y);
+      pipeline.setLocation((float) pt.getX() + x, (float) pt.getY() + y);
 
-      triangles.draw(gl);
+      triangles.draw();
     }
 
-    pipeline.unbindBuffer(gl);
-    pipeline.use(gl, false);
+    pipeline.unbindBuffer();
+    pipeline.use(false);
   }
 
   protected Triangles getTesselatedGlyph(char c) {

@@ -24,19 +24,20 @@ import java.awt.GradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.GL2GL3;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
+
 
 import org.jogamp.glg2d.GLGraphics2D;
 import org.jogamp.glg2d.impl.AbstractColorHelper;
 
 public class GL2ColorHelper extends AbstractColorHelper {
-  protected GL2 gl;
+  protected GLContext context;
 
   @Override
   public void setG2D(GLGraphics2D g2d) {
     super.setG2D(g2d);
-    gl = g2d.getGLContext().getGL().getGL2();
+    context = g2d.getGLContext();
   }
 
   @Override
@@ -64,7 +65,7 @@ public class GL2ColorHelper extends AbstractColorHelper {
 
   @Override
   public void setColorNoRespectComposite(Color c) {
-    setColor(gl, c, 1);
+    setColor(c, 1);
   }
 
   /**
@@ -80,12 +81,12 @@ public class GL2ColorHelper extends AbstractColorHelper {
       alpha = ((AlphaComposite) composite).getAlpha();
     }
 
-    setColor(gl, c, alpha);
+    setColor(c, alpha);
   }
 
-  private void setColor(GL2 gl, Color c, float preMultiplyAlpha) {
+  private void setColor(Color c, float preMultiplyAlpha) {
     int rgb = c.getRGB();
-    gl.glColor4ub((byte) (rgb >> 16 & 0xFF), (byte) (rgb >> 8 & 0xFF), (byte) (rgb & 0xFF), (byte) ((rgb >> 24 & 0xFF) * preMultiplyAlpha));
+    GL11.glColor4ub((byte) (rgb >> 16 & 0xFF), (byte) (rgb >> 8 & 0xFF), (byte) (rgb & 0xFF), (byte) ((rgb >> 24 & 0xFF) * preMultiplyAlpha));
   }
 
   @Override
@@ -105,10 +106,10 @@ public class GL2ColorHelper extends AbstractColorHelper {
     // glRasterPos* is transformed, but CopyPixels is not
     int x2 = x + dx;
     int y2 = y + dy + height;
-    gl.glRasterPos2i(x2, y2);
+    GL11.glRasterPos2i(x2, y2);
 
     int x1 = x;
     int y1 = g2d.getCanvasHeight() - (y + height);
-    gl.glCopyPixels(x1, y1, width, height, GL2GL3.GL_COLOR);
+    GL11.glCopyPixels(x1, y1, width, height, GL11.GL_COLOR);
   }
 }

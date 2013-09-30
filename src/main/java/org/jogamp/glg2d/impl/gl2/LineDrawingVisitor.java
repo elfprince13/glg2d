@@ -18,9 +18,8 @@ package org.jogamp.glg2d.impl.gl2;
 
 import java.awt.BasicStroke;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.fixedfunc.GLMatrixFunc;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.impl.BasicStrokeLineVisitor;
 
@@ -30,11 +29,11 @@ import org.jogamp.glg2d.impl.BasicStrokeLineVisitor;
  * of quads for each line segment, joins corners and endpoints as appropriate.
  */
 public class LineDrawingVisitor extends BasicStrokeLineVisitor {
-  protected GL2 gl;
+  protected GLContext context;
 
   @Override
-  public void setGLContext(GL context) {
-    gl = context.getGL2();
+  public void setGLContext(GLContext ctx) {
+    context = ctx;
   }
 
   @Override
@@ -42,9 +41,9 @@ public class LineDrawingVisitor extends BasicStrokeLineVisitor {
     /*
      * pen hangs down and to the right. See java.awt.Graphics
      */
-    gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-    gl.glPushMatrix();
-    gl.glTranslatef(0.5f, 0.5f, 0);
+    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    GL11.glPushMatrix();
+    GL11.glTranslatef(0.5f, 0.5f, 0);
 
     super.beginPoly(windingRule);
   }
@@ -53,12 +52,12 @@ public class LineDrawingVisitor extends BasicStrokeLineVisitor {
   public void endPoly() {
     super.endPoly();
 
-    gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-    gl.glPopMatrix();
+    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+    GL11.glPopMatrix();
   }
 
   @Override
   protected void drawBuffer() {
-    vBuffer.drawBuffer(gl, GL.GL_TRIANGLE_STRIP);
+    vBuffer.drawBuffer(GL11.GL_TRIANGLE_STRIP);
   }
 }

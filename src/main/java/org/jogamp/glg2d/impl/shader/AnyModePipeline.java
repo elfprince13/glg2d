@@ -19,10 +19,9 @@ import static org.jogamp.glg2d.GLG2DUtils.ensureIsGLBuffer;
 
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2ES2;
-
-import com.jogamp.common.nio.Buffers;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 
 public class AnyModePipeline extends AbstractShaderPipeline {
   protected int vertCoordBuffer = -1;
@@ -36,51 +35,51 @@ public class AnyModePipeline extends AbstractShaderPipeline {
     super(vertexShaderFileName, null, fragmentShaderFileName);
   }
 
-  public void bindBuffer(GL2ES2 gl) {
-    gl.glEnableVertexAttribArray(vertCoordLocation);
-    vertCoordBuffer = ensureIsGLBuffer(gl, vertCoordBuffer);
+  public void bindBuffer() {
+    GL20.glEnableVertexAttribArray(vertCoordLocation);
+    vertCoordBuffer = ensureIsGLBuffer(vertCoordBuffer);
 
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vertCoordBuffer);
-    gl.glVertexAttribPointer(vertCoordLocation, 2, GL.GL_FLOAT, false, 0, 0);
+    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertCoordBuffer);
+    GL20.glVertexAttribPointer(vertCoordLocation, 2, GL11.GL_FLOAT, false, 0, 0);
   }
 
-  public void bindBufferData(GL2ES2 gl, FloatBuffer vertexBuffer) {
-    bindBuffer(gl);
+  public void bindBufferData(FloatBuffer vertexBuffer) {
+    bindBuffer();
 
     int count = vertexBuffer.limit() - vertexBuffer.position();
-    gl.glBufferData(GL.GL_ARRAY_BUFFER, Buffers.SIZEOF_FLOAT * count, vertexBuffer, GL2ES2.GL_STREAM_DRAW);
+    GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STREAM_DRAW);
   }
 
-  public void unbindBuffer(GL2ES2 gl) {
-    gl.glDisableVertexAttribArray(vertCoordLocation);
-    gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+  public void unbindBuffer() {
+    GL20.glDisableVertexAttribArray(vertCoordLocation);
+    GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
   }
 
-  public void draw(GL2ES2 gl, int mode, FloatBuffer vertexBuffer) {
-    bindBufferData(gl, vertexBuffer);
+  public void draw(int mode, FloatBuffer vertexBuffer) {
+    bindBufferData(vertexBuffer);
 
     int numPts = (vertexBuffer.limit() - vertexBuffer.position()) / 2;
-    gl.glDrawArrays(mode, 0, numPts);
+    GL11.glDrawArrays(mode, 0, numPts);
 
-    unbindBuffer(gl);
+    unbindBuffer();
   }
 
   @Override
-  protected void setupUniformsAndAttributes(GL2ES2 gl) {
-    super.setupUniformsAndAttributes(gl);
+  protected void setupUniformsAndAttributes() {
+    super.setupUniformsAndAttributes();
 
-    transformLocation = gl.glGetUniformLocation(programId, "u_transform");
-    colorLocation = gl.glGetUniformLocation(programId, "u_color");
+    transformLocation = GL20.glGetUniformLocation(programId, "u_transform");
+    colorLocation = GL20.glGetUniformLocation(programId, "u_color");
 
-    vertCoordLocation = gl.glGetAttribLocation(programId, "a_vertCoord");
+    vertCoordLocation = GL20.glGetAttribLocation(programId, "a_vertCoord");
   }
 
   @Override
-  public void delete(GL2ES2 gl) {
-    super.delete(gl);
+  public void delete() {
+    super.delete();
 
-    if (gl.glIsBuffer(vertCoordBuffer)) {
-      gl.glDeleteBuffers(1, new int[] { vertCoordBuffer }, 0);
+    if (GL15.glIsBuffer(vertCoordBuffer)) {
+      GL15.glDeleteBuffers(vertCoordBuffer);
     }
   }
 }

@@ -17,11 +17,8 @@ package org.jogamp.glg2d;
 
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.fixedfunc.GLPointerFunc;
-
-import com.jogamp.common.nio.Buffers;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.BufferUtils;
 
 /**
  * Wraps a simple {@code FloatBuffer} and makes it easier to push 2-D vertices
@@ -62,7 +59,7 @@ public class VertexBuffer {
    *          The size of the buffer in number of vertices
    */
   public VertexBuffer(int capacity) {
-    this(Buffers.newDirectFloatBuffer(capacity * 2));
+    this(BufferUtils.createFloatBuffer(capacity * 2));
   }
 
   /**
@@ -110,7 +107,7 @@ public class VertexBuffer {
 
   protected void ensureCapacity(int numNewFloats) {
     if (buffer.capacity() <= buffer.position() + numNewFloats) {
-      FloatBuffer larger = Buffers.newDirectFloatBuffer(buffer.position() * 2);
+      FloatBuffer larger = BufferUtils.createFloatBuffer(buffer.position() * 2);
       deviceBufferId = -deviceBufferId;
       int position = buffer.position();
       buffer.rewind();
@@ -140,7 +137,7 @@ public class VertexBuffer {
    * @param mode
    *          The mode, e.g. {@code GL#GL_LINE_STRIP}
    */
-  public void drawBuffer(GL2 gl, int mode) {
+  public void drawBuffer(int mode) {
     if (buffer.position() == 0) {
       return;
     }
@@ -148,11 +145,11 @@ public class VertexBuffer {
     int count = buffer.position();
     buffer.rewind();
 
-    gl.glVertexPointer(2, GL.GL_FLOAT, 0, buffer);
+    GL11.glVertexPointer(2, 0, buffer);
 
-    gl.glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
-    gl.glDrawArrays(mode, 0, count / 2);
-    gl.glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+    GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+    GL11.glDrawArrays(mode, 0, count / 2);
+    GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 
     buffer.position(count);
   }

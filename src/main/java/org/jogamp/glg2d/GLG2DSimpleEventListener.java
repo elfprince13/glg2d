@@ -15,8 +15,9 @@
  */
 package org.jogamp.glg2d;
 
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GLContext;
+import org.lwjgl.opengl.GL11;
 import javax.swing.JComponent;
 
 /**
@@ -28,7 +29,7 @@ import javax.swing.JComponent;
  * update the size and layout of the painted Swing component.
  * </p>
  */
-public class GLG2DSimpleEventListener implements GLEventListener {
+public class GLG2DSimpleEventListener {
   /**
    * The cached object.
    */
@@ -47,20 +48,19 @@ public class GLG2DSimpleEventListener implements GLEventListener {
     this.comp = component;
   }
 
-  @Override
-  public void display(GLAutoDrawable drawable) {
-    prePaint(drawable);
+  public void display() {
+    prePaint();
     paintGL(g2d);
-    postPaint(drawable);
+    postPaint();
   }
 
   /**
    * Called before any painting is done. This should setup the matrices and ask
    * the {@code GLGraphics2D} object to setup any client state.
    */
-  protected void prePaint(GLAutoDrawable drawable) {
-    setupViewport(drawable);
-    g2d.prePaint(drawable.getContext());
+  protected void prePaint() {
+    setupViewport();
+    g2d.prePaint();
 
     // clip to only the component we're painting
     g2d.translate(comp.getX(), comp.getY());
@@ -70,14 +70,14 @@ public class GLG2DSimpleEventListener implements GLEventListener {
   /**
    * Defines the viewport to paint into.
    */
-  protected void setupViewport(GLAutoDrawable drawable) {
-    drawable.getGL().glViewport(0, 0, drawable.getWidth(), drawable.getHeight());
+  protected void setupViewport() {
+    GL11.glViewport(0, 0, Display.getWidth(), Display.getHeight());
   }
 
   /**
    * Called after all Java2D painting is complete.
    */
-  protected void postPaint(GLAutoDrawable drawable) {
+  protected void postPaint() {
     g2d.postPaint();
   }
 
@@ -99,25 +99,22 @@ public class GLG2DSimpleEventListener implements GLEventListener {
     comp.setDoubleBuffered(wasDoubleBuffered);
   }
 
-  @Override
-  public void init(GLAutoDrawable drawable) {
-    g2d = createGraphics2D(drawable);
+  public void init() {
+    g2d = createGraphics2D();
   }
 
-  @Override
-  public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+  public void reshape(int x, int y, int width, int height) {
   }
 
   /**
    * Creates the {@code Graphics2D} object that forwards Java2D calls to OpenGL
    * calls.
    */
-  protected GLGraphics2D createGraphics2D(GLAutoDrawable drawable) {
+  protected GLGraphics2D createGraphics2D() {
     return new GLGraphics2D();
   }
 
-  @Override
-  public void dispose(GLAutoDrawable arg0) {
+  public void dispose() {
     if (g2d != null) {
       g2d.glDispose();
       g2d = null;

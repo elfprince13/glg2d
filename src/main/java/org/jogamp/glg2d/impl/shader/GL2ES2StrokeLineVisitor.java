@@ -19,13 +19,13 @@ package org.jogamp.glg2d.impl.shader;
 import java.awt.BasicStroke;
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2ES2;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.impl.BasicStrokeLineVisitor;
 
 public class GL2ES2StrokeLineVisitor extends BasicStrokeLineVisitor implements ShaderPathVisitor {
-  protected GL2ES2 gl;
+  protected GLContext context;
   protected UniformBufferObject uniforms;
 
   protected AnyModePipeline pipeline;
@@ -39,18 +39,18 @@ public class GL2ES2StrokeLineVisitor extends BasicStrokeLineVisitor implements S
   }
 
   @Override
-  public void setGLContext(GL context, UniformBufferObject uniforms) {
-    setGLContext(context);
+  public void setGLContext(GLContext glContext, UniformBufferObject uniforms) {
+    setGLContext(glContext);
 
     this.uniforms = uniforms;
   }
 
   @Override
-  public void setGLContext(GL context) {
-    gl = context.getGL2ES2();
+  public void setGLContext(GLContext ctx) {
+    context = ctx;
 
     if (!pipeline.isSetup()) {
-      pipeline.setup(gl);
+      pipeline.setup();
     }
   }
 
@@ -61,9 +61,9 @@ public class GL2ES2StrokeLineVisitor extends BasicStrokeLineVisitor implements S
 
   @Override
   public void beginPoly(int windingRule) {
-    pipeline.use(gl, true);
-    pipeline.setTransform(gl, uniforms.transformHook.getGLMatrixData());
-    pipeline.setColor(gl, uniforms.colorHook.getRGBA());
+    pipeline.use(true);
+    pipeline.setTransform(uniforms.transformHook.getGLMatrixData());
+    pipeline.setColor(uniforms.colorHook.getRGBA());
 
     super.beginPoly(windingRule);
   }
@@ -72,7 +72,7 @@ public class GL2ES2StrokeLineVisitor extends BasicStrokeLineVisitor implements S
   public void endPoly() {
     super.endPoly();
 
-    pipeline.use(gl, false);
+    pipeline.use(false);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class GL2ES2StrokeLineVisitor extends BasicStrokeLineVisitor implements S
 
     buf.flip();
 
-    pipeline.draw(gl, GL.GL_TRIANGLE_STRIP, buf);
+    pipeline.draw(GL11.GL_TRIANGLE_STRIP, buf);
 
     vBuffer.clear();
   }

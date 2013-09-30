@@ -24,7 +24,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DirectColorModel;
 
-import javax.media.opengl.GLDrawable;
+import org.lwjgl.opengl.Drawable;
+import org.lwjgl.opengl.Display;
 
 /**
  * Fulfills the contract of a {@code GraphicsConfiguration}.
@@ -36,11 +37,11 @@ import javax.media.opengl.GLDrawable;
  * </p>
  */
 public class GLGraphicsConfiguration extends GraphicsConfiguration {
-  private final GLDrawable target;
+  private final Drawable target;
 
   private final GLGraphicsDevice device;
 
-  public GLGraphicsConfiguration(GLDrawable drawable) {
+  public GLGraphicsConfiguration(Drawable drawable) {
     target = drawable;
     device = new GLGraphicsDevice(this);
   }
@@ -90,10 +91,10 @@ public class GLGraphicsConfiguration extends GraphicsConfiguration {
 
   @Override
   public Rectangle getBounds() {
-    return new Rectangle(target.getWidth(), target.getHeight());
+    return new Rectangle(Display.getWidth(), Display.getHeight());
   }
 
-  public GLDrawable getTarget() {
+  public Drawable getTarget() {
     return target;
   }
 }

@@ -15,8 +15,7 @@
  */
 package org.jogamp.glg2d;
 
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLEventListener;
+import org.lwjgl.opengl.Drawable;
 import javax.swing.JComponent;
 
 /**
@@ -33,7 +32,7 @@ import javax.swing.JComponent;
  * component takes up the entire NEWT frame.
  * </p>
  */
-public class GLG2DHeadlessListener implements GLEventListener {
+public class GLG2DHeadlessListener {
   protected JComponent comp;
 
   public GLG2DHeadlessListener(JComponent component) {
@@ -44,21 +43,17 @@ public class GLG2DHeadlessListener implements GLEventListener {
     comp = component;
   }
 
-  @Override
-  public void init(GLAutoDrawable drawable) {
+  public void init(Drawable drawable) {
     comp.addNotify();
   }
 
-  @Override
-  public void dispose(GLAutoDrawable drawable) {
+  public void dispose(Drawable drawable) {
   }
 
-  @Override
-  public void display(GLAutoDrawable drawable) {
+  public void display(Drawable drawable) {
   }
 
-  @Override
-  public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+  public void reshape(Drawable drawable, int x, int y, int width, int height) {
     comp.setSize(width, height);
     comp.validate();
   }

@@ -17,7 +17,7 @@ package org.jogamp.glg2d;
 
 import java.awt.Container;
 
-import javax.media.opengl.GLAutoDrawable;
+import org.lwjgl.opengl.Drawable;
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 
@@ -27,7 +27,7 @@ public class GLAwareRepaintManager extends RepaintManager {
   @Override
   public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
     GLG2DCanvas canvas = getGLParent(c);
-    if (canvas == null || c instanceof GLAutoDrawable) {
+    if (canvas == null || c instanceof Drawable) {
       super.addDirtyRegion(c, x, y, w, h);
     } else {
       canvas.repaint();

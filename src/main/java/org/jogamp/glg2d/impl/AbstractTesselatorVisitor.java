@@ -19,11 +19,11 @@ package org.jogamp.glg2d.impl;
 import java.awt.BasicStroke;
 import java.awt.geom.PathIterator;
 
-import javax.media.opengl.GLException;
-import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUtessellator;
-import javax.media.opengl.glu.GLUtessellatorCallback;
-import javax.media.opengl.glu.GLUtessellatorCallbackAdapter;
+import org.lwjgl.opengl.OpenGLException;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.GLUtessellator;
+import org.lwjgl.util.glu.GLUtessellatorCallback;
+import org.lwjgl.util.glu.GLUtessellatorCallbackAdapter;
 
 import org.jogamp.glg2d.VertexBuffer;
 
@@ -56,46 +56,46 @@ public abstract class AbstractTesselatorVisitor extends SimplePathVisitor {
     tesselator = GLU.gluNewTess();
     configureTesselator(windingRule);
 
-    GLU.gluTessBeginPolygon(tesselator, null);
+    tesselator.gluTessBeginPolygon(null);
   }
 
   protected void configureTesselator(int windingRule) {
     switch (windingRule) {
     case PathIterator.WIND_EVEN_ODD:
-      GLU.gluTessProperty(tesselator, GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_ODD);
+      tesselator.gluTessProperty(GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_ODD);
       break;
 
     case PathIterator.WIND_NON_ZERO:
-      GLU.gluTessProperty(tesselator, GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_NONZERO);
+    	tesselator.gluTessProperty(GLU.GLU_TESS_WINDING_RULE, GLU.GLU_TESS_WINDING_NONZERO);
       break;
     }
 
-    GLU.gluTessCallback(tesselator, GLU.GLU_TESS_VERTEX, callback);
-    GLU.gluTessCallback(tesselator, GLU.GLU_TESS_BEGIN, callback);
-    GLU.gluTessCallback(tesselator, GLU.GLU_TESS_END, callback);
-    GLU.gluTessCallback(tesselator, GLU.GLU_TESS_ERROR, callback);
-    GLU.gluTessCallback(tesselator, GLU.GLU_TESS_COMBINE, callback);
-    GLU.gluTessNormal(tesselator, 0, 0, -1);
+    tesselator.gluTessCallback(GLU.GLU_TESS_VERTEX, callback);
+    tesselator.gluTessCallback(GLU.GLU_TESS_BEGIN, callback);
+    tesselator.gluTessCallback(GLU.GLU_TESS_END, callback);
+    tesselator.gluTessCallback(GLU.GLU_TESS_ERROR, callback);
+    tesselator.gluTessCallback(GLU.GLU_TESS_COMBINE, callback);
+    tesselator.gluTessNormal(0, 0, -1);
 
   }
 
   @Override
   public void moveTo(float[] vertex) {
-    GLU.gluTessBeginContour(tesselator);
+    tesselator.gluTessBeginContour();
     double[] v = new double[] { vertex[0], vertex[1], 0 };
-    GLU.gluTessVertex(tesselator, v, 0, v);
+    tesselator.gluTessVertex(v, 0, v);
     contourClosed = false;
   }
 
   @Override
   public void lineTo(float[] vertex) {
     double[] v = new double[] { vertex[0], vertex[1], 0 };
-    GLU.gluTessVertex(tesselator, v, 0, v);
+    tesselator.gluTessVertex(v, 0, v);
   }
 
   @Override
   public void closeLine() {
-    GLU.gluTessEndContour(tesselator);
+    tesselator.gluTessEndContour();
     contourClosed = true;
   }
 
@@ -106,8 +106,8 @@ public abstract class AbstractTesselatorVisitor extends SimplePathVisitor {
       closeLine();
     }
 
-    GLU.gluTessEndPolygon(tesselator);
-    GLU.gluDeleteTess(tesselator);
+    tesselator.gluTessEndPolygon();
+    tesselator.gluDeleteTess();
   }
 
   protected void beginTess(int type) {
@@ -145,7 +145,7 @@ public abstract class AbstractTesselatorVisitor extends SimplePathVisitor {
 
     @Override
     public void error(int errnum) {
-      throw new GLException("Tesselation Error: " + new GLU().gluErrorString(errnum));
+      throw new OpenGLException("Tesselation Error: " + GLU.gluErrorString(errnum));
     }
   }
 }

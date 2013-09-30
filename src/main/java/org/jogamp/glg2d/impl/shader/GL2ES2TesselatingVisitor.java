@@ -18,13 +18,12 @@ package org.jogamp.glg2d.impl.shader;
 
 import java.nio.FloatBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2ES2;
+import org.lwjgl.opengl.GLContext;
 
 import org.jogamp.glg2d.impl.AbstractTesselatorVisitor;
 
 public class GL2ES2TesselatingVisitor extends AbstractTesselatorVisitor implements ShaderPathVisitor {
-  protected GL2ES2 gl;
+  protected GLContext context;
   protected UniformBufferObject uniforms;
 
   protected AnyModePipeline pipeline;
@@ -38,35 +37,35 @@ public class GL2ES2TesselatingVisitor extends AbstractTesselatorVisitor implemen
   }
 
   @Override
-  public void setGLContext(GL context) {
-    gl = context.getGL2ES2();
+  public void setGLContext(GLContext ctx) {
+    context = ctx;
 
     if (!pipeline.isSetup()) {
-      pipeline.setup(gl);
+      pipeline.setup();
     }
   }
 
   @Override
-  public void setGLContext(GL glContext, UniformBufferObject uniforms) {
+  public void setGLContext(GLContext glContext, UniformBufferObject uniforms) {
     setGLContext(glContext);
     this.uniforms = uniforms;
   }
 
   @Override
   public void beginPoly(int windingRule) {
-    pipeline.use(gl, true);
+    pipeline.use(true);
 
     super.beginPoly(windingRule);
 
-    pipeline.setColor(gl, uniforms.colorHook.getRGBA());
-    pipeline.setTransform(gl, uniforms.transformHook.getGLMatrixData());
+    pipeline.setColor(uniforms.colorHook.getRGBA());
+    pipeline.setTransform(uniforms.transformHook.getGLMatrixData());
   }
 
   @Override
   public void endPoly() {
     super.endPoly();
 
-    pipeline.use(gl, false);
+    pipeline.use(false);
   }
 
   @Override
@@ -74,6 +73,6 @@ public class GL2ES2TesselatingVisitor extends AbstractTesselatorVisitor implemen
     FloatBuffer buf = vBuffer.getBuffer();
     buf.flip();
 
-    pipeline.draw(gl, drawMode, buf);
+    pipeline.draw(drawMode, buf);
   }
 }
