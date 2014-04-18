@@ -33,11 +33,11 @@ import org.jogamp.glg2d.VertexBuffer;
  * all the way around, we know that every turn went the same direction. That
  * ensures it's convex. That's necessary, but not sufficient since we might
  * still have self-intersections. For that, we check that the total curvature
- * along the path is 2π. That ensures it's simple.
+ * along the path is 2pi. That ensures it's simple.
  * 
  * <p>
  * This checks every corner and if it has the same sign and total curvature is
- * 2π, we know the polygon is convex. Once we get to the end, we draw it. If
+ * 2pi, we know the polygon is convex. Once we get to the end, we draw it. If
  * it's not convex, then we fall back to tesselating it.
  * </p>
  * <p>
@@ -63,7 +63,7 @@ public class SimpleOrTesselatingVisitor extends SimplePathVisitor {
 
   /**
    * The total curvature along the path. Since we know we close the path, if
-   * it's a simple, convex polygon, we'll have a total curvature of 2π.
+   * it's a simple, convex polygon, we'll have a total curvature of 2pi.
    */
   protected double totalCurvature;
 
@@ -178,7 +178,7 @@ public class SimpleOrTesselatingVisitor extends SimplePathVisitor {
       }
 
       /*
-       * Check that the total curvature along the path is less than 2π.
+       * Check that the total curvature along the path is less than 2pi.
        */
       double norm1sq = diff1 * diff1 + diff2 * diff2;
       double norm2sq = diff3 * diff3 + diff4 * diff4;
