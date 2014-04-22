@@ -1,7 +1,3 @@
-.project
-.classpath
-.settings
-.nbproject
 target
 bin
 *.log
